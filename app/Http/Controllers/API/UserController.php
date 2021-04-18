@@ -74,7 +74,38 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|max:50',
+            'email' => 'required|email|unique:users,email,' . $id
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
+
+            // Check user is already exists
+            if(!$user) return response()->json(['message' => 'User not found'], 404);
+
+            // Update user details
+            $user->name = $request->name;
+            $user->email = preg_replace('/\s+/', '', strtolower($request->email));
+            $user->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => 'User updated',
+                'code' => 200,
+                'error' => false,
+                'results' => $user
+            ], 200);
+        } catch(\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => true,
+                'code' => 500
+            ], 500);
+        } 
     }
 
     public function destroy($id)
