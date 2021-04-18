@@ -38,7 +38,7 @@ class UserController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'User created',
-                'code' => 200,
+                'code' => 201,
                 'error' => false,
                 'results' => $newUser
             ], 201);
