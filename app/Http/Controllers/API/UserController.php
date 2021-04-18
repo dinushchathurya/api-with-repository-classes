@@ -19,16 +19,39 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function create()
-    {
-        //
-    }
-
     public function store(Request $request)
     {
-        //
-    }
+        $this->validate($request, [
+            'name' => 'required|max:50',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|max:50'
+        ]);
 
+        DB::beginTransaction();   
+        try {
+            $newUser = new User;
+            $newUser->name = $request->name;
+            $newUser->email = preg_replace('/\s+/', '', strtolower($request->email));
+            $newUser->password = \Hash::make($request->password);
+            $newUser->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => 'User created',
+                'code' => 200,
+                'error' => false,
+                'results' => $newUser
+            ], 201);
+        } catch(\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => true,
+                'code' => 500
+            ], 500);
+        }
+    }
+    
     public function show($id)
     {
         //
