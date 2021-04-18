@@ -54,7 +54,17 @@ class UserController extends Controller
     
     public function show($id)
     {
-        //
+        $user = User::find($id);
+
+        // Check user is alreay exists
+        if(!$user) return response()->json(['message' => 'User not found'], 404);
+
+        return response()->json([
+            'message' => 'User detail',
+            'code' => 200,
+            'error' => false,
+            'results' => $user
+        ], 200);
     }
 
     public function edit($id)
