@@ -10,13 +10,14 @@ use DB;
 
 class UserRepository implements UserInterface
 {
-    // Use ResponseAPI Trait in this repository
+    // Use APIResponse Trait in this repository
     use APIResponse;
 
     public function getAllUsers()
     {
         try {
             $users = User::all();
+            throw new \Exception("Something went wrong", 500);
             return $this->success("All Users", $users);
         } catch(\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
